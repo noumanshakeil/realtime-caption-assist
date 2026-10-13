@@ -1,0 +1,11 @@
+{
+  "project": "realtime-caption-assist",
+  "resource": "streams",
+  "samples": [
+    {
+      "id": "cap1",
+      "title": "Townhall",
+      "partial": "Welcome everyone"
+    }
+  ]
+}
