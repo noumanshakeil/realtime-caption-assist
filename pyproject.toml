@@ -1,0 +1,13 @@
+[project]
+name = "realtime-caption-assist"
+version = "2.0.0"
+description = "Live caption sessions with partial/final lines, speaker labels, and latency tracking — built for assistive and broadcast workflows."
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

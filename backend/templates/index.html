@@ -1,52 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{{ title }}</title>
-  <link rel="stylesheet" href="/static/styles.css" />
-</head>
-<body>
-  <main>
-    <h1>{{ title }}</h1>
-    <p class="sub">{{ description }} · LLM <span class="pill">{{ llm_mode }}</span></p>
-    <div class="grid">
-      <section class="card">
-        <h2>Create stream</h2>
-        <form method="post" action="/ui/create">
-        <label>title</label><input name="title" placeholder="title" required />
-<label>partial</label><input name="partial" placeholder="partial" required />
-          <button type="submit">Save</button>
-        </form>
-        <h2 style="margin-top:1.25rem">AI action: {{ action }}</h2>
-        <p class="sub">{{ action_desc }}</p>
-        <form method="post" action="/ui/action">
-          <label>prompt</label>
-          <textarea name="prompt" rows="4" placeholder="Describe what you need..."></textarea>
-          <button type="submit">Run {{ action }}</button>
-        </form>
-        {% if last_result %}
-        <h3>Last result</h3>
-        <pre>{{ last_result }}</pre>
-        {% endif %}
-      </section>
-      <section class="card">
-        <h2>{{ resource }} ({{ items|length }})</h2>
-        <table>
-          <thead><tr><th>id</th><th>data</th></tr></thead>
-          <tbody>
-          {% for item in items %}
-            <tr>
-              <td>{{ item.id }}</td>
-              <td><code>{{ item }}</code></td>
-            </tr>
-          {% else %}
-            <tr><td colspan="2">No items yet</td></tr>
-          {% endfor %}
-          </tbody>
-        </table>
-      </section>
-    </div>
-  </main>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>{{ title }}</title><link rel="stylesheet" href="/static/styles.css"/></head>
+<body><main>
+<h1>{{ title }}</h1>
+<p class="sub">Partial/final caption lines with speaker labels and latency stats.</p>
+<div class="grid">
+<section class="card">
+  <h2>Start session</h2>
+  <form method="post" action="/ui/sessions"><label>Title</label><input name="title" required/><button type="submit">Go live</button></form>
+  <h3>Sessions</h3>
+  <ul>{% for s in sessions %}<li><a href="/?session_id={{ s.id }}">{{ s.title }}</a> <span class="pill">{{ s.status }}</span></li>{% else %}<li class="sub">None</li>{% endfor %}</ul>
+</section>
+<section class="card">
+  {% if session_id %}
+  <h2>Feed <span class="pill">{{ session_id }}</span></h2>
+  <div class="sub">avg={{ stats.avg_ms }}ms · p95={{ stats.p95_ms }}ms · n={{ stats.count }}</div>
+  <form method="post" action="/ui/lines">
+    <input type="hidden" name="session_id" value="{{ session_id }}"/>
+    <label>Speaker</label><input name="speaker" value="spk1"/>
+    <label>Latency ms</label><input name="latency_ms" type="number" value="95"/>
+    <label>Text</label><textarea name="text" rows="3" required></textarea>
+    <label><input type="checkbox" name="is_final" value="1" checked/> Final</label>
+    <button type="submit">Push line</button>
+  </form>
+  {% for l in lines %}
+    <article class="card" style="margin:.4rem 0"><span class="pill">{{ l.speaker }}</span>
+    {% if l.is_final %}<span class="pill">final</span>{% else %}<span class="pill">partial</span>{% endif %}
+    <span class="pill">{{ l.latency_ms }}ms</span><div>{{ l.text }}</div></article>
+  {% endfor %}
+  {% else %}<p class="sub">Start a session to caption.</p>{% endif %}
+</section>
+</div></main></body></html>
